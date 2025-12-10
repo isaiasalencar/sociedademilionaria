@@ -1,56 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Gerador Mega-Sena</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0a0f24;
-      color: #fff;
-      text-align: center;
-      padding-top: 50px;
-    }
-    button {
-      background: #1ed760;
-      border: none;
-      padding: 12px 30px;
-      font-size: 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    button:hover {
-      opacity: .8;
-    }
-    #resultado {
-      margin-top: 40px;
-      font-size: 32px;
-      letter-spacing: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Gerador Mega-Sena Macabro</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(#000000, #0a0f24);
+            color: #fff;
+            text-align: center;
+            padding-top: 50px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 40px;
+            text-shadow: 0 0 20px red;
+        }
+
+        p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        button {
+            background: #8e0000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            color: #fff;
+            box-shadow: 0 0 10px red;
+        }
+
+        button:hover {
+            background: #b30000;
+        }
+
+        #resultado {
+            margin-top: 40px;
+            font-size: 36px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 15px purple;
+        }
+
+        /* morcegos */
+        .bat {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            background: url('https://i.imgur.com/5J2dYBt.png') no-repeat;
+            background-size: contain;
+            animation: fly 6s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-10%) translateY(0) scale(1); }
+            50% { transform: translateX(110%) translateY(-40px) scale(1.2); }
+            100% { transform: translateX(-10%) translateY(0) scale(1); }
+        }
+    </style>
 </head>
 <body>
 
-<h1>Gerador de Números da Mega-Sena</h1>
-<p>Somente para o grupo sociedade milionária.</p>
+<h1>⚰️ Gerador Macabro da Mega-Sena ☠️</h1>
+<p>Somente para o grupo Sociedade Milionária.</p>
 
-<button onclick="sortear()">Gerar Números</button>
+<button onclick="sortearPonderado()">Invocar Números</button>
 
 <div id="resultado"></div>
 
+<!-- Morcegos -->
+<div class="bat" style="top:10%; animation-delay:0s;"></div>
+<div class="bat" style="top:30%; animation-delay:2s;"></div>
+<div class="bat" style="top:50%; animation-delay:4s;"></div>
+<div class="bat" style="top:70%; animation-delay:1s;"></div>
+<div class="bat" style="top:20%; animation-delay:3s;"></div>
+
 <script>
-  function sortear() {
-    const numeros = new Set();
+    // Frequência HISTÓRICA real aproximada (mais sorteados recebem peso maior)
+    const frequencia = {
+        1: 255, 2: 260, 3: 270, 4: 300, 5: 315, 6: 260,
+        7: 280, 8: 290, 9: 310, 10: 345, 11: 275, 12: 255,
+        13: 280, 14: 260, 15: 300, 16: 310, 17: 295, 18: 285,
+        19: 275, 20: 260, 21: 305, 22: 280, 23: 265, 24: 275,
+        25: 290, 26: 300, 27: 310, 28: 260, 29: 285, 30: 270,
+        31: 250, 32: 260, 33: 315, 34: 320, 35: 270, 36: 260,
+        37: 290, 38: 300, 39: 275, 40: 290, 41: 260, 42: 270,
+        43: 310, 44: 300, 45: 275, 46: 260, 47: 285, 48: 300,
+        49: 270, 50: 260, 51: 275, 52: 290, 53: 335, 54: 310,
+        55: 260, 56: 280, 57: 290, 58: 310, 59: 275, 60: 300
+    };
 
-    while (numeros.size < 6) {
-      const n = Math.floor(Math.random() * 60) + 1;
-      numeros.add(n);
+    function sortearPonderado() {
+        const lista = [];
+        for (let n = 1; n <= 60; n++) {
+            lista.push({numero: n, peso: frequencia[n]});
+        }
+
+        const sorteio = new Set();
+
+        while (sorteio.size < 6) {
+            const totalPeso = lista.reduce((a, b) => a + b.peso, 0);
+            let r = Math.random() * totalPeso;
+
+            for (const item of lista) {
+                if (r < item.peso) {
+                    sorteio.add(item.numero);
+                    break;
+                }
+                r -= item.peso;
+            }
+        }
+
+        const arr = [...sorteio].sort((a, b) => a - b);
+        document.getElementById("resultado").textContent = arr.join("  ");
     }
-
-    const arr = [...numeros].sort((a, b) => a - b);
-    document.getElementById("resultado").textContent = arr.join("  ");
-  }
 </script>
 
 </body>
