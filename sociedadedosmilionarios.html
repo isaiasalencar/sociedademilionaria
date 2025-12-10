@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador Mega-Sena</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0f24;
+      color: #fff;
+      text-align: center;
+      padding-top: 50px;
+    }
+    button {
+      background: #1ed760;
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      opacity: .8;
+    }
+    #resultado {
+      margin-top: 40px;
+      font-size: 32px;
+      letter-spacing: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Gerador de Números da Mega-Sena</h1>
+<p>Somente para o grupo sociedade milionária.</p>
+
+<button onclick="sortear()">Gerar Números</button>
+
+<div id="resultado"></div>
+
+<script>
+  function sortear() {
+    const numeros = new Set();
+
+    while (numeros.size < 6) {
+      const n = Math.floor(Math.random() * 60) + 1;
+      numeros.add(n);
+    }
+
+    const arr = [...numeros].sort((a, b) => a - b);
+    document.getElementById("resultado").textContent = arr.join("  ");
+  }
+</script>
+
+</body>
+</html>
