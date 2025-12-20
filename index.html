@@ -1,46 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Gerador Mega-Sena Macabro</title>
+<meta charset="UTF-8">
+<title>Gerador Mega-Sena Macabro</title>
 
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(#000000, #0a0f24);
-            color: #fff;
-            text-align: center;
-            padding-top: 50px;
-        }
-        h1 { font-size: 40px; text-shadow: 0 0 20px red; }
-        button {
-            background: #8e0000;
-            border: none;
-            padding: 12px 30px;
-            font-size: 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            color: #fff;
-        }
-        button:disabled {
-            opacity: .4;
-            cursor: not-allowed;
-        }
-        #resultado {
-            margin-top: 40px;
-            font-size: 36px;
-            letter-spacing: 8px;
-        }
-    </style>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(#000000, #0a0f24);
+    color: #fff;
+    text-align: center;
+    padding-top: 40px;
+}
+
+h1 {
+    font-size: 38px;
+    text-shadow: 0 0 20px red;
+}
+
+button {
+    background: #8e0000;
+    border: none;
+    padding: 14px 32px;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    color: #fff;
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+#resultado {
+    margin-top: 40px;
+    font-size: 36px;
+    letter-spacing: 8px;
+}
+
+#pix-area {
+    margin-top: 25px;
+    padding: 20px;
+    border: 1px dashed #8e0000;
+    border-radius: 12px;
+    display: none;
+    background: rgba(0,0,0,.7);
+    animation: surgir .8s ease-out forwards;
+}
+
+@keyframes surgir {
+    from { opacity: 0; transform: scale(.6); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+#pix-area img {
+    width: 220px;
+    margin-top: 10px;
+    filter: drop-shadow(0 0 15px red);
+}
+
+#contador {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #ff4d4d;
+}
+</style>
 </head>
+
 <body>
 
 <h1>⚰️ Gerador Macabro da Mega-Sena ☠️</h1>
-<p>Somente para o grupo Sociedade Milionária.</p>
+<p>Somente para a Sociedade Milionária.</p>
 
 <div id="login-area"></div>
 
@@ -50,63 +84,110 @@
 
 <div id="resultado"></div>
 
+<audio id="thunder">
+    <source src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-    window.onload = () => {
-        if (!window.google) {
-            console.error("Google Identity não carregou");
-            return;
-        }
+let pactoAceito = false;
 
-        google.accounts.id.initialize({
-            client_id: "1027215876013-6qa237omr6k4v2idtommbokridfupe2g.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
+window.onload = () => {
+    if (!window.google) return;
 
-        google.accounts.id.renderButton(
-            document.getElementById("login-area"),
-            { theme: "filled_black", size: "large" }
-        );
-    };
+    google.accounts.id.initialize({
+        client_id: "1027215876013-6qa237omr6k4v2idtommbokridfupe2g.apps.googleusercontent.com",
+        callback: handleCredentialResponse
+    });
 
-    function handleCredentialResponse(response) {
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    google.accounts.id.renderButton(
+        document.getElementById("login-area"),
+        { theme: "filled_black", size: "large" }
+    );
 
-        document.getElementById("login-area").innerHTML = `
-            <p>Logado como</p>
-            <img src="${payload.picture}" width="60" style="border-radius:50%"><br>
-            <strong>${payload.name}</strong><br>
-            <small>${payload.email}</small>
-        `;
+    atualizarContador();
+};
 
-        document.getElementById("btnSortear").disabled = false;
+function handleCredentialResponse(response) {
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+
+    document.getElementById("login-area").innerHTML = `
+        <p>Invocador autenticado</p>
+        <img src="${payload.picture}" width="60" style="border-radius:50%"><br>
+        <strong>${payload.name}</strong><br>
+        <small>${payload.email}</small><br>
+
+        <button onclick="aceitarPacto()">🩸 Aceitar o Pacto</button>
+
+        <div id="pix-area">
+            <p>O ritual exige uma oferenda</p>
+            <strong>Pix: 61998671760</strong><br>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=00020126360014BR.GOV.BCB.PIX0111619986717605204000053039865802BR5920Sociedade%20Milionaria6009SAO%20PAULO62070503***6304B14F">
+            <div id="contador"></div>
+        </div>
+    `;
+}
+
+function aceitarPacto() {
+    pactoAceito = true;
+
+    document.getElementById("pix-area").style.display = "block";
+    document.getElementById("btnSortear").disabled = false;
+
+    // Som de trovão
+    document.getElementById("thunder").play();
+
+    // Vibração mobile
+    if (navigator.vibrate) {
+        navigator.vibrate([300, 150, 300]);
     }
 
-    const frequencia = { 1:255,2:260,3:270,4:300,5:315,6:260,7:280,8:290,9:310,10:345,
-        11:275,12:255,13:280,14:260,15:300,16:310,17:295,18:285,19:275,20:260,
-        21:305,22:280,23:265,24:275,25:290,26:300,27:310,28:260,29:285,30:270,
-        31:250,32:260,33:315,34:320,35:270,36:260,37:290,38:300,39:275,40:290,
-        41:260,42:270,43:310,44:300,45:275,46:260,47:285,48:300,49:270,50:260,
-        51:275,52:290,53:335,54:310,55:260,56:280,57:290,58:310,59:275,60:300
-    };
+    // Contador de almas
+    let almas = localStorage.getItem("almas") || 0;
+    almas++;
+    localStorage.setItem("almas", almas);
 
-    function sortearPonderado() {
-        const lista = Object.entries(frequencia).map(([n, p]) => ({ numero: +n, peso: p }));
-        const sorteio = new Set();
+    atualizarContador();
+}
 
-        while (sorteio.size < 10) {
-            const total = lista.reduce((a,b)=>a+b.peso,0);
-            let r = Math.random() * total;
-            for (const i of lista) {
-                if ((r -= i.peso) <= 0) {
-                    sorteio.add(i.numero);
-                    break;
-                }
+function atualizarContador() {
+    const contador = document.getElementById("contador");
+    if (!contador) return;
+    const almas = localStorage.getItem("almas") || 0;
+    contador.innerHTML = `☠️ Almas que aceitaram o pacto: <strong>${almas}</strong>`;
+}
+
+const frequencia = {
+1:255,2:260,3:270,4:300,5:315,6:260,7:280,8:290,9:310,10:345,
+11:275,12:255,13:280,14:260,15:300,16:310,17:295,18:285,19:275,20:260,
+21:305,22:280,23:265,24:275,25:290,26:300,27:310,28:260,29:285,30:270,
+31:250,32:260,33:315,34:320,35:270,36:260,37:290,38:300,39:275,40:290,
+41:260,42:270,43:310,44:300,45:275,46:260,47:285,48:300,49:270,50:260,
+51:275,52:290,53:335,54:310,55:260,56:280,57:290,58:310,59:275,60:300
+};
+
+function sortearPonderado() {
+    if (!pactoAceito) {
+        alert("O pacto não foi selado.");
+        return;
+    }
+
+    const lista = Object.entries(frequencia).map(([n,p]) => ({numero:+n,peso:p}));
+    const sorteio = new Set();
+
+    while (sorteio.size < 10) {
+        const total = lista.reduce((a,b)=>a+b.peso,0);
+        let r = Math.random() * total;
+        for (const i of lista) {
+            if ((r -= i.peso) <= 0) {
+                sorteio.add(i.numero);
+                break;
             }
         }
-
-        document.getElementById("resultado").textContent =
-            [...sorteio].sort((a,b)=>a-b).join("  ");
     }
+
+    document.getElementById("resultado").textContent =
+        [...sorteio].sort((a,b)=>a-b).join("  ");
+}
 </script>
 
 </body>
