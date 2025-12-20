@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Gerador Mega-Sena Macabro</title>
 
+    <!-- Google Identity -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,6 +43,11 @@
             background: #b30000;
         }
 
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         #resultado {
             margin-top: 40px;
             font-size: 36px;
@@ -47,10 +55,9 @@
             text-shadow: 0 0 15px purple;
         }
 
-        @keyframes fly {
-            0% { transform: translateX(-10%) translateY(0) scale(1); }
-            50% { transform: translateX(110%) translateY(-40px) scale(1.2); }
-            100% { transform: translateX(-10%) translateY(0) scale(1); }
+        #login-area img {
+            margin-top: 10px;
+            box-shadow: 0 0 10px red;
         }
     </style>
 </head>
@@ -59,19 +66,31 @@
 <h1>⚰️ Gerador Macabro da Mega-Sena ☠️</h1>
 <p>Somente para o grupo Sociedade Milionária.</p>
 
-<button onclick="sortearPonderado()">Invocar Números</button>
+<!-- LOGIN GOOGLE -->
+<div id="login-area">
+    <div id="g_id_onload"
+         data-client_id="1027215876013-6qa237omr6k4v2idtommbokridfupe2g.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+
+    <div class="g_id_signin"
+         data-type="standard"
+         data-theme="filled_black"
+         data-size="large">
+    </div>
+</div>
+
+<br>
+
+<button onclick="sortearPonderado()" id="btnSortear" disabled>
+    Invocar Números
+</button>
 
 <div id="resultado"></div>
 
-<!-- Morcegos -->
-<div class="bat" style="top:10%; animation-delay:0s;"></div>
-<div class="bat" style="top:30%; animation-delay:2s;"></div>
-<div class="bat" style="top:50%; animation-delay:4s;"></div>
-<div class="bat" style="top:70%; animation-delay:1s;"></div>
-<div class="bat" style="top:20%; animation-delay:3s;"></div>
-
 <script>
-    // Frequência HISTÓRICA real aproximada (mais sorteados recebem peso maior)
+    // Frequência histórica aproximada
     const frequencia = {
         1: 255, 2: 260, 3: 270, 4: 300, 5: 315, 6: 260,
         7: 280, 8: 290, 9: 310, 10: 345, 11: 275, 12: 255,
@@ -85,10 +104,25 @@
         55: 260, 56: 280, 57: 290, 58: 310, 59: 275, 60: 300
     };
 
+    function handleCredentialResponse(response) {
+        const payload = JSON.parse(atob(response.credential.split('.')[1]));
+
+        console.log("Usuário logado:", payload);
+
+        document.getElementById("login-area").innerHTML = `
+            <p>Logado como:</p>
+            <img src="${payload.picture}" width="70" style="border-radius:50%"><br>
+            <strong>${payload.name}</strong><br>
+            <small>${payload.email}</small>
+        `;
+
+        document.getElementById("btnSortear").disabled = false;
+    }
+
     function sortearPonderado() {
         const lista = [];
         for (let n = 1; n <= 60; n++) {
-            lista.push({numero: n, peso: frequencia[n]});
+            lista.push({ numero: n, peso: frequencia[n] });
         }
 
         const sorteio = new Set();
