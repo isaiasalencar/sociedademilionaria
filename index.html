@@ -176,7 +176,7 @@ function sortearPonderado() {
     const lista = Object.entries(frequencia).map(([n,p]) => ({numero:+n,peso:p}));
     const sorteio = new Set();
 
-    while (sorteio.size < 10) {
+    while (sorteio.size < 6) {
         const total = lista.reduce((a,b)=>a+b.peso,0);
         let r = Math.random() * total;
         for (const i of lista) {
